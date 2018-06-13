@@ -1,0 +1,2 @@
+class Pdu < ApplicationRecord
+end

@@ -1,0 +1,73 @@
+-@rigs = RigStat.latest
+
+.container
+  %p
+    Total rigs: #{@rigs.count}
+    =hashrates(@rigs)
+%hr
+
+.container-fluid
+  .row
+    %table.table.table-sm
+      %tr
+        %th.text-right p
+        %th v
+        %th
+        %th m
+        %th gpu
+        %th name
+        %th loc
+        %th ip
+        %th ut
+        %th mt
+        %th rx
+        %th tx
+        %th C
+        %th L
+        %th R
+        %th H
+        %th temps
+        %th hashes
+
+      -@rigs.each do |rig|
+        %tr
+          %td.text-right
+            -if rig.last_ping  > 300
+              .text-danger=rig.last_ping
+            -else
+              .text-success=rig.last_ping
+
+          %td=rig.version
+          %td=rig.driver.first.upcase
+          %td
+            -if rig.miner == "claymore"
+              cl
+            -if rig.miner == "claymore-xmr"
+              cl-xmr
+          %td=rig.gpus
+
+          %td=rig.hostname
+          %td=rig.rack_loc
+          %td=link_to rig.ip, "http://#{rig.ip}", target: "_blank"
+          %td=seconds_to_time rig.uptime
+          %td=seconds_to_time rig.miner_secs
+          %td=rig.rx_kbps
+          %td=rig.tx_kbps
+          %td=rig.cpu_temp
+          %td=rig.load
+          %td=rig.ram
+          %td=rig.hash_rate.to_i
+
+
+
+          %td
+            -rig.temps.each do |temp|
+              %span{style: "color: #{temp_class(temp)};"}=temp
+
+          %td
+            -rig.hashes.each do |hash|
+              -if rig.miner == "claymore-xmr" && hash > 840
+                -color = "success"
+              -if rig.miner == "claymore-xmr" && hash < 800
+                -color = "danger"
+              %span{class: "text-#{color}"}=display_hash hash
